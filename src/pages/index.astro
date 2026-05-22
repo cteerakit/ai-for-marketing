@@ -1,42 +1,16 @@
 ---
 import "../styles/global.css";
+import { MODULE_IDS, WORKSHOP_NAME, en, moduleNames } from "../i18n";
+import { getPlaceholderDefault, getPlaceholders, isNumericPlaceholder } from "../lib/prompt-template";
 
-const modules = [
-  {
-    id: "personas-research",
-    title: "AI Personas & Customer Research",
-    description:
-      "Use generative AI to sharpen customer understanding, pressure-test audience assumptions, and turn messy market context into actionable persona insights.",
-    prompts: [
-      "Act as a market research expert. Analyze the following target demographic..."
-    ]
-  },
-  {
-    id: "copywriting-content",
-    title: "Copywriting & Content Velocity",
-    description:
-      "Move from blank page to tested messaging faster with repeatable copywriting frameworks, voice adaptation, and creative iteration prompts.",
-    prompts: [
-      "Rewrite this headline using the PAS (Problem-Agitation-Solution) framework..."
-    ]
-  },
-  {
-    id: "campaign-strategy",
-    title: "AI-Driven Campaign Strategy",
-    description:
-      "Translate positioning, audience intent, and channel roles into campaign plans that marketing teams can execute and adapt.",
-    prompts: [
-      "Draft a multi-channel launch calendar for a SaaS product targeting..."
-    ]
-  }
-];
+const t = en;
 ---
 
 <!doctype html>
 <html lang="en" class="dark h-full">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Generative AI for Marketing Transformation workshop companion app" />
+    <meta name="description" content={t.meta.description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script is:inline>
       (() => {
@@ -45,88 +19,157 @@ const modules = [
           const theme = storedTheme === "light" || storedTheme === "dark" ? storedTheme : "dark";
           document.documentElement.classList.toggle("dark", theme === "dark");
           document.documentElement.dataset.theme = theme;
+
+          const storedLocale = localStorage.getItem("locale");
+          if (storedLocale === "th") document.documentElement.lang = "th";
         } catch {
           document.documentElement.classList.add("dark");
           document.documentElement.dataset.theme = "dark";
         }
       })();
     </script>
-    <title>Generative AI for Marketing Transformation</title>
+    <title>{WORKSHOP_NAME}</title>
   </head>
   <body class="h-full overflow-hidden bg-background">
-    <div class="flex h-screen min-h-0 bg-background text-foreground">
-      <aside class="hidden w-64 shrink-0 flex-col border-r border-border bg-background md:flex">
+    <div class="relative flex h-screen min-h-0 bg-background text-foreground">
+      <div
+        class="fixed inset-0 z-30 hidden bg-background/80 backdrop-blur-sm md:hidden"
+        data-sidebar-overlay
+      ></div>
+      <aside
+        id="workshop-sidebar"
+        class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full shrink-0 flex-col border-r border-border bg-background transition-transform duration-200 ease-out md:static md:z-auto md:translate-x-0"
+        data-sidebar
+        data-i18n-aria="ui.sidebarAria"
+        aria-label={t.ui.sidebarAria}
+      >
         <div class="border-b border-border px-5 py-5">
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <p class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Workshop</p>
-              <h1 class="mt-2 text-base font-semibold leading-6 text-foreground">
-                Generative AI for Marketing Transformation
-              </h1>
-            </div>
-            <button
-              type="button"
-              class="theme-toggle inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-input bg-background text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-              data-theme-toggle
-              aria-label="Switch to light mode"
-            >
-              <svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="4"></circle>
-                <path d="M12 2v2"></path>
-                <path d="M12 20v2"></path>
-                <path d="m4.93 4.93 1.41 1.41"></path>
-                <path d="m17.66 17.66 1.41 1.41"></path>
-                <path d="M2 12h2"></path>
-                <path d="M20 12h2"></path>
-                <path d="m6.34 17.66-1.41 1.41"></path>
-                <path d="m19.07 4.93-1.41 1.41"></path>
-              </svg>
-              <svg class="h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M12 3a6 6 0 0 0 9 7.5A9 9 0 1 1 12 3Z"></path>
-              </svg>
-            </button>
+          <div>
+            <p class="text-xs font-medium uppercase tracking-wide text-muted-foreground" data-i18n="ui.workshop">
+              {t.ui.workshop}
+            </p>
+            <h1 class="mt-2 text-base font-semibold leading-6 text-foreground" data-i18n="ui.appTitle">
+              {WORKSHOP_NAME}
+            </h1>
           </div>
         </div>
 
-        <nav aria-label="Workshop modules" class="flex-1 space-y-1 px-3 py-4">
+        <nav data-i18n-aria="ui.navAria" aria-label={t.ui.navAria} class="flex-1 space-y-1 px-3 py-4">
           {
-            modules.map((module, index) => (
-              <button
-                type="button"
-                class:list={[
-                  "module-tab flex w-full items-start rounded-md px-3 py-2 text-left text-sm font-medium transition-colors",
-                  index === 0
-                    ? "bg-secondary text-secondary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                ]}
-                data-module-tab={module.id}
-                aria-controls={`panel-${module.id}`}
-                aria-selected={index === 0 ? "true" : "false"}
-              >
-                <span class="mr-3 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-border bg-background text-[11px] text-muted-foreground">
-                  {index + 1}
-                </span>
-                <span class="leading-5">{module.title}</span>
-              </button>
-            ))
+            MODULE_IDS.map((moduleId, index) => {
+              const module = t.modules[moduleId];
+              const name = moduleNames[moduleId];
+              return (
+                <button
+                  type="button"
+                  class:list={[
+                    "module-tab flex w-full items-start rounded-md px-3 py-2 text-left text-sm font-medium transition-colors",
+                    index === 0
+                      ? "bg-secondary text-secondary-foreground shadow-sm"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  ]}
+                  data-module-tab={moduleId}
+                  data-module-title={module.title}
+                  data-module-number={module.badge}
+                  aria-controls={`panel-${moduleId}`}
+                  aria-selected={index === 0 ? "true" : "false"}
+                >
+                  <span class="mr-3 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-border bg-background text-[11px] text-muted-foreground">
+                    {moduleId === "welcome" ? (
+                      <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    ) : moduleId === "wrap-up" ? (
+                      <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                    ) : name.number !== undefined ? (
+                      <span data-tab-number>{name.number}</span>
+                    ) : null}
+                  </span>
+                  <span class="leading-5" data-tab-title>{module.title}</span>
+                </button>
+              );
+            })
           }
         </nav>
       </aside>
 
       <main class="min-w-0 flex-1 overflow-y-auto bg-background">
-        <div class="border-b border-border bg-background px-5 py-4 md:hidden">
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <p class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Workshop</p>
-              <h1 class="mt-2 text-base font-semibold leading-6 text-foreground">
-                Generative AI for Marketing Transformation
-              </h1>
+        <div class="flex items-center justify-between border-b border-border bg-background px-4 py-3 md:px-6">
+          <div class="flex items-center gap-3">
+            <button
+              type="button"
+              class="sidebar-toggle inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-input bg-background text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              data-sidebar-toggle
+              data-i18n-aria="ui.hideSidebar"
+              aria-controls="workshop-sidebar"
+              aria-expanded="true"
+              aria-label={t.ui.hideSidebar}
+            >
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 6h16"></path>
+                <path d="M4 12h16"></path>
+                <path d="M4 18h16"></path>
+              </svg>
+            </button>
+
+            <div class="hidden h-5 w-px bg-border sm:block"></div>
+
+            <div class="flex items-center gap-2">
+              <span id="active-module-badge" class="rounded bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider shrink-0">
+                {t.modules.welcome.badge}
+              </span>
+              <span class="text-muted-foreground/40 text-xs sm:inline hidden">/</span>
+              <h2 id="active-module-title" class="text-sm font-semibold tracking-tight text-foreground truncate max-w-[120px] sm:max-w-[280px] md:max-w-md">
+                {t.modules.welcome.title}
+              </h2>
             </div>
+          </div>
+
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="md:hidden">
+              <label for="mobile-module-select" class="sr-only" data-i18n="ui.selectModule">{t.ui.selectModule}</label>
+              <select
+                id="mobile-module-select"
+                class="rounded-md border border-input bg-card px-2.5 py-1.5 text-xs font-medium text-foreground outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/40"
+              >
+                {
+                  MODULE_IDS.map((moduleId) => (
+                    <option value={moduleId}>{t.modules[moduleId].title}</option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div
+              class="inline-flex items-center rounded-md border border-input bg-background p-0.5 shadow-sm"
+              role="group"
+              data-i18n-aria="ui.language"
+              aria-label={t.ui.language}
+            >
+              <button
+                type="button"
+                class="locale-toggle rounded px-2.5 py-1.5 text-xs font-semibold transition-colors bg-secondary text-secondary-foreground shadow-sm"
+                data-locale-toggle
+                data-locale="en"
+                aria-pressed="true"
+              >
+                <span data-i18n="ui.english">{t.ui.english}</span>
+              </button>
+              <button
+                type="button"
+                class="locale-toggle rounded px-2.5 py-1.5 text-xs font-semibold transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                data-locale-toggle
+                data-locale="th"
+                aria-pressed="false"
+              >
+                <span data-i18n="ui.thai">{t.ui.thai}</span>
+              </button>
+            </div>
+
             <button
               type="button"
               class="theme-toggle inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-input bg-background text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               data-theme-toggle
-              aria-label="Switch to light mode"
+              data-i18n-aria="ui.switchToLight"
+              aria-label={t.ui.switchToLight}
             >
               <svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="4"></circle>
@@ -144,198 +187,453 @@ const modules = [
               </svg>
             </button>
           </div>
-          <label for="mobile-module-select" class="sr-only">Select module</label>
-          <select
-            id="mobile-module-select"
-            class="mt-4 w-full rounded-md border border-input bg-card px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/40"
-          >
-            {
-              modules.map((module) => (
-                <option value={module.id}>{module.title}</option>
-              ))
-            }
-          </select>
         </div>
 
         <div class="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
           {
-            modules.map((module, index) => (
-              <section
-                id={`panel-${module.id}`}
-                class:list={[
-                  "module-panel",
-                  index === 0 ? "block" : "hidden"
-                ]}
-                data-module-panel={module.id}
-                aria-labelledby={`heading-${module.id}`}
-              >
-                <div class="max-w-3xl">
-                  <p class="text-sm font-medium text-muted-foreground">Module {index + 1}</p>
-                  <h2 id={`heading-${module.id}`} class="mt-3 text-3xl font-semibold tracking-normal text-foreground sm:text-4xl">
-                    {module.title}
-                  </h2>
-                  <p class="mt-4 text-base leading-7 text-muted-foreground">
-                    {module.description}
-                  </p>
-                </div>
+            MODULE_IDS.map((moduleId, index) => {
+              const module = t.modules[moduleId];
+              return (
+                <section
+                  id={`panel-${moduleId}`}
+                  class:list={["module-panel", index === 0 ? "block" : "hidden"]}
+                  data-module-panel={moduleId}
+                  aria-label={module.title}
+                >
+                  <div class="max-w-3xl">
+                    <p class="text-base leading-7 text-muted-foreground" data-panel-description>
+                      {module.description}
+                    </p>
+                  </div>
 
-                <div class="mt-8 space-y-4">
-                  {
-                    module.prompts.map((prompt, promptIndex) => (
-                      <article class="rounded-lg border border-border bg-card p-5 text-card-foreground shadow-card">
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                          <div>
-                            <p class="text-sm font-medium text-card-foreground">Prompt {promptIndex + 1}</p>
-                            <p class="mt-1 text-xs text-muted-foreground">Ready to copy into your AI workspace</p>
-                          </div>
-                          <button
-                            type="button"
-                            class="copy-button inline-flex h-9 items-center justify-center rounded-md border border-input bg-transparent px-3 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                            data-copy-text={prompt}
-                          >
-                            Copy
-                          </button>
+                  {moduleId === "welcome" ? (
+                    <div class="mt-8 space-y-8">
+                      <article class="rounded-lg border border-border bg-card p-6 text-card-foreground shadow-card">
+                        <div class="flex items-center gap-2 border-b border-border pb-4">
+                          <svg class="h-5 w-5 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                            <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                          </svg>
+                          <h3 class="text-base font-semibold" data-i18n="welcome.wifiTitle">{t.welcome.wifiTitle}</h3>
                         </div>
-                        <pre class="mt-4 overflow-x-auto whitespace-pre-wrap rounded-md border border-border bg-muted p-4 text-sm leading-6 text-foreground"><code>{prompt}</code></pre>
+
+                        <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                          <div class="flex items-center justify-between rounded-md border border-border bg-muted/50 px-4 py-3">
+                            <div>
+                              <p class="text-xs text-muted-foreground uppercase tracking-wider font-semibold" data-i18n="welcome.networkSsid">{t.welcome.networkSsid}</p>
+                              <p class="mt-1 text-sm font-medium text-foreground">Workshop_HighSpeed</p>
+                            </div>
+                            <button
+                              type="button"
+                              class="inline-flex h-8 w-8 items-center justify-center rounded border border-input bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                              data-copy-text="Workshop_HighSpeed"
+                              data-i18n-aria="ui.copySsid"
+                              aria-label={t.ui.copySsid}
+                            >
+                              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                          </div>
+
+                          <div class="flex items-center justify-between rounded-md border border-border bg-muted/50 px-4 py-3">
+                            <div>
+                              <p class="text-xs text-muted-foreground uppercase tracking-wider font-semibold" data-i18n="welcome.password">{t.welcome.password}</p>
+                              <p class="mt-1 text-sm font-medium text-foreground">ai-transformation-2026</p>
+                            </div>
+                            <button
+                              type="button"
+                              class="inline-flex h-8 w-8 items-center justify-center rounded border border-input bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                              data-copy-text="ai-transformation-2026"
+                              data-i18n-aria="ui.copyPassword"
+                              aria-label={t.ui.copyPassword}
+                            >
+                              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                          </div>
+                        </div>
                       </article>
-                    ))
-                  }
-                </div>
-              </section>
-            ))
+
+                      <div class="space-y-4">
+                        <h3 class="text-base font-semibold border-l-2 border-primary pl-3" data-i18n="welcome.essentialTools">{t.welcome.essentialTools}</h3>
+                        <div class="grid gap-4 sm:grid-cols-3">
+                          <article class="flex flex-col justify-between rounded-lg border border-border bg-card p-5 text-card-foreground shadow-card hover:border-muted-foreground/30 transition-colors">
+                            <div>
+                              <div class="flex items-center gap-3">
+                                <span class="flex h-10 w-10 items-center justify-center rounded-md bg-sky-500/10 text-sky-500">
+                                  <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2c0 5.523 4.477 10 10 10-5.523 0-10 4.477-10 10 0-5.523-4.477-10-10-10 5.523 0 10-4.477 10-10z" />
+                                  </svg>
+                                </span>
+                                <h4 class="font-semibold text-sm" data-i18n="welcome.gemini.name">{t.welcome.gemini.name}</h4>
+                              </div>
+                              <p class="mt-3 text-xs text-muted-foreground leading-normal" data-i18n="welcome.gemini.description">{t.welcome.gemini.description}</p>
+                            </div>
+                            <a
+                              href="https://gemini.google.com"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="mt-5 inline-flex h-9 items-center justify-center rounded-md border border-input bg-transparent px-3 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                              data-i18n="welcome.gemini.launch"
+                            >
+                              {t.welcome.gemini.launch}
+                            </a>
+                          </article>
+
+                          <article class="flex flex-col justify-between rounded-lg border border-border bg-card p-5 text-card-foreground shadow-card hover:border-muted-foreground/30 transition-colors">
+                            <div>
+                              <div class="flex items-center gap-3">
+                                <span class="flex h-10 w-10 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-500">
+                                  <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z" class="opacity-20" />
+                                    <path d="M12 6v12M6 12h12M7.75 7.75l8.5 8.5M16.25 7.75l-8.5 8.5" />
+                                  </svg>
+                                </span>
+                                <h4 class="font-semibold text-sm" data-i18n="welcome.chatgpt.name">{t.welcome.chatgpt.name}</h4>
+                              </div>
+                              <p class="mt-3 text-xs text-muted-foreground leading-normal" data-i18n="welcome.chatgpt.description">{t.welcome.chatgpt.description}</p>
+                            </div>
+                            <a
+                              href="https://chatgpt.com"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="mt-5 inline-flex h-9 items-center justify-center rounded-md border border-input bg-transparent px-3 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                              data-i18n="welcome.chatgpt.launch"
+                            >
+                              {t.welcome.chatgpt.launch}
+                            </a>
+                          </article>
+
+                          <article class="flex flex-col justify-between rounded-lg border border-border bg-card p-5 text-card-foreground shadow-card hover:border-muted-foreground/30 transition-colors">
+                            <div>
+                              <div class="flex items-center gap-3">
+                                <span class="flex h-10 w-10 items-center justify-center rounded-md bg-amber-600/10 text-amber-600">
+                                  <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 20h9"></path>
+                                    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+                                  </svg>
+                                </span>
+                                <h4 class="font-semibold text-sm" data-i18n="welcome.claude.name">{t.welcome.claude.name}</h4>
+                              </div>
+                              <p class="mt-3 text-xs text-muted-foreground leading-normal" data-i18n="welcome.claude.description">{t.welcome.claude.description}</p>
+                            </div>
+                            <a
+                              href="https://claude.ai"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="mt-5 inline-flex h-9 items-center justify-center rounded-md border border-input bg-transparent px-3 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                              data-i18n="welcome.claude.launch"
+                            >
+                              {t.welcome.claude.launch}
+                            </a>
+                          </article>
+                        </div>
+                      </div>
+                    </div>
+                  ) : moduleId === "wrap-up" ? (
+                    <div class="mt-8 space-y-8">
+                      <article class="rounded-lg border border-border bg-card p-6 text-card-foreground shadow-card hover:border-muted-foreground/30 transition-colors">
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                          <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                              <span class="flex h-10 w-10 items-center justify-center rounded-md bg-sky-500/10 text-sky-500">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                                </svg>
+                              </span>
+                              <h4 class="font-semibold text-sm" data-i18n="wrapUp.slidesTitle">{t.wrapUp.slidesTitle}</h4>
+                            </div>
+                            <p class="text-xs text-muted-foreground leading-relaxed max-w-2xl" data-i18n="wrapUp.slidesDescription">
+                              {t.wrapUp.slidesDescription}
+                            </p>
+                          </div>
+                          <a
+                            href="https://docs.google.com/presentation/d/1wIAYQjtYnZO1ncwSpTm_3nY2qATmllU2YeKGxEDFEOk/edit?usp=sharing"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex h-9 shrink-0 items-center justify-center rounded-md border border-input bg-transparent px-4 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground sm:min-w-[10rem]"
+                            data-i18n="wrapUp.openSlides"
+                          >
+                            {t.wrapUp.openSlides}
+                          </a>
+                        </div>
+                      </article>
+
+                      <div class="grid gap-6 sm:grid-cols-2">
+                        <article class="flex flex-col justify-between rounded-lg border border-border bg-card p-6 text-card-foreground shadow-card hover:border-muted-foreground/30 transition-colors">
+                          <div class="space-y-4">
+                            <div class="flex items-center gap-3">
+                              <span class="flex h-10 w-10 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-500">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M12 20h9" />
+                                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                                </svg>
+                              </span>
+                              <h4 class="font-semibold text-sm" data-i18n="wrapUp.feedbackTitle">{t.wrapUp.feedbackTitle}</h4>
+                            </div>
+                            <p class="text-xs text-muted-foreground leading-relaxed" data-i18n="wrapUp.feedbackDescription">
+                              {t.wrapUp.feedbackDescription}
+                            </p>
+                          </div>
+                          <div class="mt-8 flex flex-col gap-2">
+                            <span class="inline-flex items-center gap-1.5 self-start rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-amber-500 uppercase tracking-wider" data-i18n="wrapUp.formComingSoon">
+                              {t.wrapUp.formComingSoon}
+                            </span>
+                            <button
+                              type="button"
+                              disabled
+                              class="inline-flex h-9 w-full items-center justify-center rounded-md border border-border bg-muted/50 px-4 text-xs font-semibold text-muted-foreground/50 shadow-sm cursor-not-allowed"
+                              data-i18n="wrapUp.feedbackButton"
+                            >
+                              {t.wrapUp.feedbackButton}
+                            </button>
+                          </div>
+                        </article>
+
+                        <article class="flex flex-col justify-between rounded-lg border border-border bg-card p-6 text-card-foreground shadow-card hover:border-muted-foreground/30 transition-colors">
+                          <div class="space-y-4">
+                            <div class="flex items-center gap-3">
+                              <span class="flex h-10 w-10 items-center justify-center rounded-md bg-indigo-500/10 text-indigo-500">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                              </span>
+                              <h4 class="font-semibold text-sm" data-i18n="wrapUp.discordTitle">{t.wrapUp.discordTitle}</h4>
+                            </div>
+                            <p class="text-xs text-muted-foreground leading-relaxed" data-i18n="wrapUp.discordDescription">
+                              {t.wrapUp.discordDescription}
+                            </p>
+                          </div>
+                          <div class="mt-8 flex flex-col gap-2">
+                            <span class="inline-flex items-center gap-1.5 self-start rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-amber-500 uppercase tracking-wider" data-i18n="wrapUp.discordComingSoon">
+                              {t.wrapUp.discordComingSoon}
+                            </span>
+                            <button
+                              type="button"
+                              disabled
+                              class="inline-flex h-9 w-full items-center justify-center rounded-md border border-border bg-muted/50 px-4 text-xs font-semibold text-muted-foreground/50 shadow-sm cursor-not-allowed"
+                              data-i18n="wrapUp.discordButton"
+                            >
+                              {t.wrapUp.discordButton}
+                            </button>
+                          </div>
+                        </article>
+                      </div>
+                    </div>
+                  ) : module.workshops ? (
+                    <div class="mt-8 space-y-8">
+                      {
+                        moduleId === "personas-research" && (
+                          <div class="space-y-4">
+                            <h3 class="text-base font-semibold border-l-2 border-primary pl-3" data-i18n="personasResearch.essentialTool">
+                              {t.personasResearch.essentialTool}
+                            </h3>
+                            <article class="flex flex-col justify-between rounded-lg border border-border bg-card p-5 text-card-foreground shadow-card hover:border-muted-foreground/30 transition-colors sm:max-w-md">
+                              <div>
+                                <div class="flex items-center gap-3">
+                                  <span class="flex h-10 w-10 items-center justify-center rounded-md bg-violet-500/10 text-violet-500">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"></path>
+                                      <path d="M8 7h8M8 11h6"></path>
+                                    </svg>
+                                  </span>
+                                  <h4 class="font-semibold text-sm" data-i18n="personasResearch.notebooklm.name">{t.personasResearch.notebooklm.name}</h4>
+                                </div>
+                                <p class="mt-3 text-xs text-muted-foreground leading-normal" data-i18n="personasResearch.notebooklm.description">
+                                  {t.personasResearch.notebooklm.description}
+                                </p>
+                              </div>
+                              <a
+                                href="https://notebooklm.google.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="mt-5 inline-flex h-9 items-center justify-center rounded-md border border-input bg-transparent px-3 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                                data-i18n="personasResearch.notebooklm.launch"
+                              >
+                                {t.personasResearch.notebooklm.launch}
+                              </a>
+                            </article>
+                          </div>
+                        )
+                      }
+                      {
+                        module.workshops.map((workshop, workshopIndex) => (
+                          <article
+                            class="rounded-lg border border-border bg-card p-6 text-card-foreground shadow-card"
+                            data-workshop
+                            data-workshop-index={workshopIndex}
+                          >
+                            <button
+                              type="button"
+                              class="flex w-full items-center justify-between gap-3 text-left"
+                              data-workshop-toggle
+                              aria-expanded="true"
+                            >
+                              <h3 class="text-base font-semibold" data-workshop-title>
+                                {workshop.title}
+                              </h3>
+                              <svg
+                                class="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200"
+                                data-workshop-chevron
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </button>
+                            <div class="mt-5 space-y-6" data-workshop-content>
+                              {
+                                workshop.categories ? (
+                                  workshop.categories.map((category, categoryIndex) => {
+                                    const promptOffset = workshop.categories!
+                                      .slice(0, categoryIndex)
+                                      .reduce((sum, item) => sum + item.prompts.length, 0);
+
+                                    return (
+                                      <div class="space-y-4">
+                                        {
+                                          category.prompts.map((prompt, indexInCategory) => {
+                                            const promptIndex = promptOffset + indexInCategory;
+                                            const label = prompt.label ?? `${t.ui.promptLabel} ${promptIndex + 1}`;
+
+                                            return (
+                                              <div
+                                                class="flex items-start justify-between gap-3 rounded-md border border-border bg-muted/50 px-4 py-3"
+                                                data-prompt-index={promptIndex}
+                                                data-prompt-template={prompt.text}
+                                                data-prompt-static="true"
+                                                data-prompt-preview
+                                              >
+                                                <div class="min-w-0 flex-1">
+                                                  <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground" data-prompt-label>
+                                                    {label}
+                                                  </p>
+                                                  <pre class="mt-1 overflow-x-auto whitespace-pre-wrap text-sm font-medium leading-6 text-foreground"><code data-prompt-code>{prompt.text}</code></pre>
+                                                </div>
+                                                <button
+                                                  type="button"
+                                                  class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded border border-input bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                                  data-copy-prompt
+                                                  data-i18n-aria="ui.copy"
+                                                  aria-label={t.ui.copy}
+                                                >
+                                                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                                </button>
+                                              </div>
+                                            );
+                                          })
+                                        }
+                                      </div>
+                                    );
+                                  })
+                                ) : (
+                                  workshop.prompts?.map((prompt, promptIndex) => {
+                                    const label = prompt.label ?? `${t.ui.promptLabel} ${promptIndex + 1}`;
+
+                                    return (
+                                      <div
+                                        class="flex items-start justify-between gap-3 rounded-md border border-border bg-muted/50 px-4 py-3"
+                                        data-prompt-index={promptIndex}
+                                        data-prompt-template={prompt.text}
+                                        data-prompt-static="true"
+                                        data-prompt-preview
+                                      >
+                                        <div class="min-w-0 flex-1">
+                                          <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground" data-prompt-label>
+                                            {label}
+                                          </p>
+                                          <pre class="mt-1 overflow-x-auto whitespace-pre-wrap text-sm font-medium leading-6 text-foreground"><code data-prompt-code>{prompt.text}</code></pre>
+                                        </div>
+                                        <button
+                                          type="button"
+                                          class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded border border-input bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                          data-copy-prompt
+                                          data-i18n-aria="ui.copy"
+                                          aria-label={t.ui.copy}
+                                        >
+                                          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                        </button>
+                                      </div>
+                                    );
+                                  })
+                                )
+                              }
+                            </div>
+                          </article>
+                        ))
+                      }
+                    </div>
+                  ) : (
+                    <div class="mt-8 space-y-4">
+                      {
+                        module.prompts.map((prompt, promptIndex) => {
+                          const placeholders = getPlaceholders(prompt);
+                          return (
+                            <article
+                              class="rounded-lg border border-border bg-card p-5 text-card-foreground shadow-card"
+                              data-prompt-index={promptIndex}
+                              data-prompt-template={prompt}
+                            >
+                              <p class="text-sm font-medium text-card-foreground" data-prompt-label>
+                                {t.ui.promptLabel} {promptIndex + 1}
+                              </p>
+                              <div class="relative mt-4 rounded-md border border-border bg-muted p-4 pr-12" data-prompt-preview>
+                                <pre class="overflow-x-auto whitespace-pre-wrap text-sm leading-6 text-foreground"><code data-prompt-code>{prompt}</code></pre>
+                                <button
+                                  type="button"
+                                  class="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded border border-input bg-background text-muted-foreground shadow-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                                  data-copy-prompt
+                                  data-i18n-aria="ui.copy"
+                                  aria-label={t.ui.copy}
+                                >
+                                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                              </div>
+                              {placeholders.length > 0 && (
+                                <div class="mt-4 space-y-3 rounded-md border border-border bg-muted/30 p-4" data-prompt-fields>
+                                  <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground" data-prompt-customize-label data-i18n="ui.promptCustomize">
+                                    {t.ui.promptCustomize}
+                                  </p>
+                                  {placeholders.map((placeholder) => (
+                                    <div class="space-y-1.5">
+                                      <label class="text-xs font-medium text-foreground">{placeholder}</label>
+                                      <input
+                                        type={isNumericPlaceholder(placeholder) ? "number" : "text"}
+                                        min={isNumericPlaceholder(placeholder) ? "1" : undefined}
+                                        data-prompt-field
+                                        data-placeholder={placeholder}
+                                        placeholder={placeholder}
+                                        value={getPlaceholderDefault(placeholder)}
+                                        class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/40"
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </article>
+                          );
+                        })
+                      }
+                    </div>
+                  )}
+                </section>
+              );
+            })
           }
         </div>
       </main>
     </div>
 
     <script>
-      const tabs = Array.from(document.querySelectorAll("[data-module-tab]"));
-      const panels = Array.from(document.querySelectorAll("[data-module-panel]"));
-      const mobileSelect = document.querySelector("#mobile-module-select");
-      const themeToggleButtons = Array.from(document.querySelectorAll("[data-theme-toggle]"));
-
-      function getTheme() {
-        try {
-          const storedTheme = localStorage.getItem("theme");
-          return storedTheme === "light" || storedTheme === "dark" ? storedTheme : "dark";
-        } catch {
-          return "dark";
-        }
-      }
-
-      function applyTheme(theme) {
-        document.documentElement.classList.toggle("dark", theme === "dark");
-        document.documentElement.dataset.theme = theme;
-
-        try {
-          localStorage.setItem("theme", theme);
-        } catch {
-          // Theme still switches for this session if storage is unavailable.
-        }
-
-        themeToggleButtons.forEach((button) => {
-          button.setAttribute(
-            "aria-label",
-            theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
-          );
-        });
-      }
-
-      function activateModule(moduleId) {
-        tabs.forEach((tab) => {
-          const isActive = tab.getAttribute("data-module-tab") === moduleId;
-          tab.classList.toggle("bg-secondary", isActive);
-          tab.classList.toggle("text-secondary-foreground", isActive);
-          tab.classList.toggle("shadow-sm", isActive);
-          tab.classList.toggle("text-muted-foreground", !isActive);
-          tab.classList.toggle("hover:bg-accent", !isActive);
-          tab.classList.toggle("hover:text-accent-foreground", !isActive);
-          tab.setAttribute("aria-selected", String(isActive));
-        });
-
-        panels.forEach((panel) => {
-          const isActive = panel.getAttribute("data-module-panel") === moduleId;
-          panel.classList.toggle("hidden", !isActive);
-          panel.classList.toggle("block", isActive);
-        });
-
-        if (mobileSelect instanceof HTMLSelectElement && mobileSelect.value !== moduleId) {
-          mobileSelect.value = moduleId;
-        }
-      }
-
-      applyTheme(getTheme());
-
-      themeToggleButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const nextTheme = document.documentElement.classList.contains("dark") ? "light" : "dark";
-          applyTheme(nextTheme);
-        });
-      });
-
-      async function copyText(text) {
-        if (navigator.clipboard && window.isSecureContext) {
-          try {
-            await navigator.clipboard.writeText(text);
-            return;
-          } catch {
-            // Some browser contexts expose Clipboard API but reject writes without a user grant.
-          }
-        }
-
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.setAttribute("readonly", "");
-        textArea.style.position = "fixed";
-        textArea.style.top = "-9999px";
-        textArea.style.left = "-9999px";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-
-        try {
-          const copied = document.execCommand("copy");
-          if (!copied) throw new Error("Copy command was not accepted.");
-        } finally {
-          document.body.removeChild(textArea);
-        }
-      }
-
-      tabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-          const moduleId = tab.getAttribute("data-module-tab");
-          if (moduleId) activateModule(moduleId);
-        });
-      });
-
-      mobileSelect?.addEventListener("change", (event) => {
-        const target = event.target;
-        if (target instanceof HTMLSelectElement) activateModule(target.value);
-      });
-
-      document.querySelectorAll("[data-copy-text]").forEach((button) => {
-        button.addEventListener("click", async () => {
-          if (!(button instanceof HTMLButtonElement)) return;
-
-          const text = button.getAttribute("data-copy-text") ?? "";
-          const initialText = button.textContent ?? "Copy";
-
-          try {
-            await copyText(text);
-            button.textContent = "Copied!";
-            button.disabled = true;
-            window.setTimeout(() => {
-              button.textContent = initialText;
-              button.disabled = false;
-            }, 2000);
-          } catch {
-            button.textContent = "Try again";
-            window.setTimeout(() => {
-              button.textContent = initialText;
-            }, 2000);
-          }
-        });
-      });
+      import "../scripts/workshop";
     </script>
   </body>
 </html>
