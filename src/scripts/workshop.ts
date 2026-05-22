@@ -465,7 +465,7 @@ function setWorkshopOpen(workshop: HTMLElement, open: boolean) {
 
   if (!(toggle instanceof HTMLButtonElement) || !(content instanceof HTMLElement)) return;
 
-  content.classList.toggle("hidden", !open);
+  content.classList.toggle("is-open", open);
   toggle.setAttribute("aria-expanded", String(open));
   chevron?.classList.toggle("-rotate-90", !open);
 }
@@ -475,6 +475,8 @@ document.querySelectorAll("[data-workshop]").forEach((workshop) => {
 
   const toggle = workshop.querySelector("[data-workshop-toggle]");
   if (!(toggle instanceof HTMLButtonElement)) return;
+
+  setWorkshopOpen(workshop, false);
 
   toggle.addEventListener("click", () => {
     const open = toggle.getAttribute("aria-expanded") !== "true";

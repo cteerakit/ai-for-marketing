@@ -38,7 +38,7 @@ const t = en;
       ></div>
       <aside
         id="workshop-sidebar"
-        class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full shrink-0 flex-col border-r border-border bg-background transition-transform duration-200 ease-out md:static md:z-auto md:translate-x-0"
+        class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full shrink-0 flex-col border-r border-border bg-background md:static md:z-auto md:translate-x-0"
         data-sidebar
         data-i18n-aria="ui.sidebarAria"
         aria-label={t.ui.sidebarAria}
@@ -470,13 +470,13 @@ const t = en;
                               type="button"
                               class="flex w-full items-center justify-between gap-3 text-left"
                               data-workshop-toggle
-                              aria-expanded="true"
+                              aria-expanded="false"
                             >
                               <h3 class="text-base font-semibold" data-workshop-title>
                                 {workshop.title}
                               </h3>
                               <svg
-                                class="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200"
+                                class="h-5 w-5 shrink-0 -rotate-90 text-muted-foreground transition-transform duration-200"
                                 data-workshop-chevron
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -489,7 +489,9 @@ const t = en;
                                 <polyline points="6 9 12 15 18 9"></polyline>
                               </svg>
                             </button>
-                            <div class="mt-5 space-y-6" data-workshop-content>
+                            <div class="collapsible-panel" data-workshop-content>
+                              <div class="collapsible-panel-inner">
+                                <div class="mt-5 space-y-6">
                               {
                                 workshop.categories ? (
                                   workshop.categories.map((category, categoryIndex) => {
@@ -566,6 +568,8 @@ const t = en;
                                   })
                                 )
                               }
+                                </div>
+                              </div>
                             </div>
                           </article>
                         ))

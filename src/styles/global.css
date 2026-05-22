@@ -68,3 +68,26 @@
       "calt" 1;
   }
 }
+
+@layer utilities {
+  .collapsible-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 200ms ease-out;
+  }
+
+  .collapsible-panel.is-open {
+    grid-template-rows: 1fr;
+  }
+
+  .collapsible-panel > .collapsible-panel-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .collapsible-panel {
+      transition: none !important;
+    }
+  }
+}
